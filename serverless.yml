@@ -1,0 +1,33 @@
+service: test-serverless
+
+plugins:
+  - serverless-localstack
+
+frameworkVersion: '1'
+
+custom:
+  localstack:
+    debug: true
+    stages:
+      - local
+    host: http://localhost
+    edgePort: 4566
+    autostart: true
+    docker:
+      sudo: False
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  deploymentBucket:
+    name: test-lambda-bucket
+    serverSideEncryption: AES256
+
+functions:
+  onItemAdded:
+    handler: src/onItemAdded.handler
+    events:
+      - s3:
+          bucket: test-bucket-dev
+          event: s3:ObjectCreated:*
